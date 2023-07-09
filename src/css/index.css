@@ -1,5 +1,5 @@
 body {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .container {
@@ -19,16 +19,16 @@ body {
   left: 0;
   padding: 20px 0px;
 
-  background-color: #f7f6f6;
+  background-color: #5f7ce6;
 }
 
 .search-form input {
   width: 360px;
   padding: 11px 0 11px 38px;
   outline: none;
-  border: 1px solid rgba(33, 33, 33, 0.2);
-  border-radius: 4px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(10, 63, 239, 0.15);
+  border-radius: 20px;
+  box-shadow: 0px 4px 4px rgba(10, 63, 239, 0.15);
   transition-property: color, border-color;
   transition-duration: 250ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -36,7 +36,7 @@ body {
 
 .search-form input:hover,
 .search-form input:focus {
-  border: 1px solid #2e2f42;
+  border: 1px solid #0511f4;
 }
 
 button {
@@ -48,8 +48,8 @@ button {
   font-size: 16px;
   letter-spacing: 0.04em;
   cursor: pointer;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
+  box-shadow: 0px 4px 4px rgba(10, 63, 239, 0.15);
+  border-radius: 20px;
   border: none;
   transition-property: fill, border-color, background-color;
   transition-duration: 250ms;
@@ -57,7 +57,7 @@ button {
 }
 
 button:hover {
-  background-color: rgb(187, 190, 190);
+  background-color: #5f7ce6;
 }
 
 .gallery {
@@ -101,7 +101,7 @@ button:hover {
   gap: 5px;
   padding: 0px 10px;
 
-  border: 1px solid #a9aab8;
+  border: 1px solid #0511f4;
   border-top: none;
 }
 
