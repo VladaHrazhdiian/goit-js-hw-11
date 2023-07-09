@@ -12,7 +12,7 @@ loadMoreButton.style.display = "none";
 
 let page = 1;
 let currentSearchQuery = '';
-const apiKey = '37798827-4b752ebc68c39b91b512cc08a'; 
+const apiKey = '38110026-5bfbf894cc748013b74eb0441'; 
 
 function displayImages(images) {
   images.forEach((image) => {
