@@ -1,5 +1,5 @@
 import Notiflix from 'notiflix';
-import PixibayAPI from './js/pixabayAPI';
+import PixabayAPI from './js/pixabayAPI';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
@@ -7,15 +7,14 @@ const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
 
-// instance of pixibayAPI
-const pixiInstance = new PixibayAPI();
 
-// render UI
+const pixabayApi = new PixabayAPI();
+
 const renderData = arrData => {
   const currentData = arrData
     .map(el => {
       return ` <div class="photo-card">
-                <a href="${el.largeImageURL}"><img src="${el.largeImageURL}" alt="${pixiInstance.query}" loading="lazy" width="350" height="250"/></a>
+                <a href="${el.largeImageURL}"><img src="${el.largeImageURL}" alt="${pixabayApi.query}" loading="lazy" width="350" height="250"/></a>
                 <div class="info">
                     <p class="info-item">
                         <span class="info-text">Likes</span>
@@ -40,7 +39,6 @@ const renderData = arrData => {
 
   galleryEl.insertAdjacentHTML('beforeend', currentData);
 
-  // simple lightbox
   let lightbox = new SimpleLightbox('.gallery a', {
     captionsData: 'alt',
     captionPosition: 'bottom',
@@ -55,30 +53,28 @@ const renderData = arrData => {
 const handleSubmitButton = async event => {
   event.preventDefault();
   loadMoreButton.classList.add('is-hidden');
-  pixiInstance.query = event.target.firstElementChild.value;
+  pixabayApi.query = event.target.firstElementChild.value;
 
-  // clear gallary before new request
   galleryEl.innerHTML = '';
 
-  // check input value
+ 
   if (!event.target.firstElementChild.value) {
     Notiflix.Notify.failure('Input is empty');
     return;
   }
 
   try {
-    const carts = await pixiInstance.fetchPhotos();
+    const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
-    pixiInstance.total_hits = carts.data.totalHits;
+    pixabayApi.total_hits = carts.data.totalHits;
 
-    //   show total hits
+ 
     if (carts && carts.data.totalHits > 0) {
       Notiflix.Notify.success(
         `Hooray! We found ${carts.data.totalHits} images.`
       );
     }
 
-    // check data was'n be not empty array
     if (cartsArray.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -95,19 +91,17 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
-    const carts = await pixiInstance.fetchPhotos();
+    const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
     renderData(cartsArray);
 
-    // check total hits
-    if (pixiInstance.total_hits <= pixiInstance.page * pixiInstance.per_page) {
+    if (pixabayApi.total_hits <= pixabayApi.page * pixabayApi.per_page) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
       loadMoreButton.classList.add('is-hidden');
     }
 
-    // scroll by 2 cart height
     const { height: cardHeight } = document
       .querySelector('.gallery')
       .firstElementChild.getBoundingClientRect();
@@ -121,6 +115,5 @@ const handleLoadMoreButton = async () => {
   }
 };
 
-// add event listener
 formEl.addEventListener('submit', handleSubmitButton);
 loadMoreButton.addEventListener('click', handleLoadMoreButton);
