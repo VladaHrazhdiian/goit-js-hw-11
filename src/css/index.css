@@ -35,7 +35,7 @@ body {
 
 .search-form input:hover,
 .search-form input:focus {
-  border: 1px solid #fffdc8;
+  border: 1px solid beige;
 }
 
 button {
