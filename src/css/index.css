@@ -1,43 +1,113 @@
+body {
+  font-size: 16px;
+}
+
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+
+  position: fixed;
+  width: 100%;
+  left: 0;
+  padding: 20px 0px;
+
+  background-color: #f7f6f6;
+}
+
+.search-form input {
+  width: 360px;
+  padding: 11px 0 11px 38px;
+  outline: none;
+  border: 1px solid rgba(33, 33, 33, 0.2);
+  border-radius: 4px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+  transition-property: color, border-color;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-form input:hover,
+.search-form input:focus {
+  border: 1px solid #2e2f42;
+}
+
+button {
+  display: block;
+  min-width: 130px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  border: none;
+  transition-property: fill, border-color, background-color;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+  background-color: rgb(187, 190, 190);
+}
+
 .gallery {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
-  margin-top: 40px;
+  gap: 15px;
+  padding: 100px 0px 20px 0px;
+}
+
+.load-more-wrapper {
+  padding-bottom: 20px;
+}
+
+.load-more {
+  margin: 0 auto;
+}
+
+.is-hidden {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 .photo-card {
-  margin: 5px;
+  flex-basis: 350px;
+}
+
+.photo-card img {
+  display: block;
+  cursor: pointer;
 }
 
 .info {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 0px 10px;
+
+  border: 1px solid #a9aab8;
+  border-top: none;
 }
 
 .info-item {
-  margin-right: 7px;
-}
-
-.search-container {
-  position: fixed;
+  display: flex;
   justify-content: center;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-color: #ffffff;
-  padding: 10px;
-  z-index: 9999;
-}
-
-.search-container input[type='text'] {
-  margin-right: 10px;
-  padding: 5px;
-  flex-grow: 1;
-}
-
-.search-container button {
-  padding: 5px 10px;
-}
-
-.gallery {
-  margin-top: 50px;
+  align-items: center;
+  flex-flow: column;
 }

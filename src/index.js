@@ -1,122 +1,126 @@
-
 import Notiflix from 'notiflix';
-import axios from "axios";
-import { searchImages } from './js/pixabayAPI';
+import PixibayAPI from './js/pixabayAPI';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const searchForm = document.querySelector('#search-form');
-const gallery = document.querySelector('.gallery');
+const formEl = document.querySelector('.search-form');
+const galleryEl = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
-const bodyEl = document.body;
-bodyEl.style.backgroundColor = "lightblue";
-loadMoreButton.style.display = "none";
 
-let page = 1;
-let currentSearchQuery = '';
-const apiKey = '38110026-5bfbf894cc748013b74eb0441'; 
+// instance of pixibayAPI
+const pixiInstance = new PixibayAPI();
 
-function displayImages(images) {
-  images.forEach((image) => {
-    const photoCard = document.createElement('div');
-    photoCard.classList.add('photo-card');
+// render UI
+const renderData = arrData => {
+  const currentData = arrData
+    .map(el => {
+      return ` <div class="photo-card">
+                <a href="${el.largeImageURL}"><img src="${el.largeImageURL}" alt="${pixiInstance.query}" loading="lazy" width="350" height="250"/></a>
+                <div class="info">
+                    <p class="info-item">
+                        <span class="info-text">Likes</span>
+                        <b> ${el.likes}</b>
+                    </p>
+                    <p class="info-item">
+                        <span class="info-text">Views</span>
+                        <b>${el.views}</b>
+                    </p>
+                    <p class="info-item">
+                        <span class="info-text">Comments</span>
+                        <b>${el.comments}</b>
+                    </p>
+                    <p class="info-item">
+                        <span class="info-text">Downloads</span>
+                        <b>${el.downloads}</b>
+                    </p>
+                </div>
+            </div>`;
+    })
+    .join('');
 
-    const img = document.createElement('img');
-    img.src = image.webformatURL;
-    img.alt = image.tags;
-    img.loading = 'lazy';
-    
+  galleryEl.insertAdjacentHTML('beforeend', currentData);
 
-    const info = document.createElement('div');
-    info.classList.add('info');
-
-    const likes = document.createElement('p');
-    likes.classList.add('info-item');
-    likes.innerHTML = `<b>Likes:</b> ${image.likes}`;
-
-    const views = document.createElement('p');
-    views.classList.add('info-item');
-    views.innerHTML = `<b>Views:</b> ${image.views}`;
-
-    const comments = document.createElement('p');
-    comments.classList.add('info-item');
-    comments.innerHTML = `<b>Comments:</b> ${image.comments}`;
-
-    const downloads = document.createElement('p');
-    downloads.classList.add('info-item');
-    downloads.innerHTML = `<b>Downloads:</b> ${image.downloads}`;
-
-    info.appendChild(likes);
-    info.appendChild(views);
-    info.appendChild(comments);
-    info.appendChild(downloads);
-
-    photoCard.appendChild(img);
-    photoCard.appendChild(info);
-
-    gallery.appendChild(photoCard);
+  // simple lightbox
+  let lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: 'alt',
+    captionPosition: 'bottom',
+    captionDelay: 250,
   });
-}
 
-function clearGallery() {
-  gallery.innerHTML = '';
-}
+  lightbox.on('show.simplelightbox', () => {
+    console.log('simple');
+  });
+};
 
+const handleSubmitButton = async event => {
+  event.preventDefault();
+  loadMoreButton.classList.add('is-hidden');
+  pixiInstance.query = event.target.firstElementChild.value;
 
-async function searchImagesByQuery(query) {
-  clearGallery();
-  page = 1;
-  currentSearchQuery = query;
+  // clear gallary before new request
+  galleryEl.innerHTML = '';
+
+  // check input value
+  if (!event.target.firstElementChild.value) {
+    Notiflix.Notify.failure('Input is empty');
+    return;
+  }
 
   try {
-    const response = await searchImages(query, page, apiKey);
-    const { hits, totalHits } = response;
+    const carts = await pixiInstance.fetchPhotos();
+    const cartsArray = carts.data.hits;
+    pixiInstance.total_hits = carts.data.totalHits;
 
-    if (hits.length === 0) {
+    //   show total hits
+    if (carts && carts.data.totalHits > 0) {
+      Notiflix.Notify.success(
+        `Hooray! We found ${carts.data.totalHits} images.`
+      );
+    }
+
+    // check data was'n be not empty array
+    if (cartsArray.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
       return;
     }
-    
-    displayImages(hits);
-    
 
-    if (hits.length < totalHits) {
-      loadMoreButton.style.display = 'block';
-    } else {
-      loadMoreButton.style.display = 'none';
-      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-    }
-  } catch (error) {
-    console.error('Error searching images:', error);
-    Notiflix.Notify.failure('An error occurred while searching for images.');
+    renderData(cartsArray);
+    loadMoreButton.classList.remove('is-hidden');
+  } catch (err) {
+    Notiflix.Notify.failure('Error 404');
   }
-}
+};
 
-async function loadMoreImages() {
-  page++;
-
+const handleLoadMoreButton = async () => {
   try {
-    const response = await searchImages(currentSearchQuery, page, apiKey);
-    const { hits, totalHits } = response;
+    const carts = await pixiInstance.fetchPhotos();
+    const cartsArray = carts.data.hits;
+    renderData(cartsArray);
 
-    displayImages(hits);
-
-    if (gallery.childElementCount >= totalHits) {
-      loadMoreButton.style.display = 'none';
-      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+    // check total hits
+    if (pixiInstance.total_hits <= pixiInstance.page * pixiInstance.per_page) {
+      Notiflix.Notify.warning(
+        "We're sorry, but you've reached the end of search results."
+      );
+      loadMoreButton.classList.add('is-hidden');
     }
-  } catch (error) {
-    console.error('Error loading more images:', error);
-    Notiflix.Notify.failure('An error occurred while loading more images.');
-  }
-}
 
-searchForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const searchQuery = event.target.elements.searchQuery.value.trim();
-  if (searchQuery !== '') {
-    searchImagesByQuery(searchQuery);
-  }
-});
+    // scroll by 2 cart height
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
 
-loadMoreButton.addEventListener('click', loadMoreImages);
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+  } catch (err) {
+    Notiflix.Notify.failure('Error 404');
+  }
+};
+
+// add event listener
+formEl.addEventListener('submit', handleSubmitButton);
+loadMoreButton.addEventListener('click', handleLoadMoreButton);
