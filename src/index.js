@@ -1,19 +1,21 @@
-import Notiflix from "notiflix";
-import PixabayAPI from "./js/pixabayAPI";
-import SimpleLightbox from "simplelightbox";
+import Notiflix from 'notiflix';
+import PixibayAPI from './js/pixibayAPI';
+import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
 
-const pixabayAPI = new PixabayAPI();
+// instance of pixibayAPI
+const pixiInstance = new PixibayAPI();
 
+// render UI
 const renderData = arrData => {
-    const currentData = arrData
-        .map(el => {
-            return ` <div class="photo-card">
-                <a href="${el.largeImageURL}"><img src="${el.largeImageURL}" alt="${pixabayAPI.query}" loading="lazy" width="350" height="250"/></a>
+  const currentData = arrData
+    .map(el => {
+      return ` <div class="photo-card">
+                <a href="${el.largeImageURL}"><img src="${el.largeImageURL}" alt="${pixiInstance.query}" loading="lazy" width="350" height="250"/></a>
                 <div class="info">
                     <p class="info-item">
                         <span class="info-text">Likes</span>
@@ -33,50 +35,50 @@ const renderData = arrData => {
                     </p>
                 </div>
             </div>`;
-        })
-        .join('');
-    
-    galleryEl.insertAdjacentHTML('beforeend', currentData);
+    })
+    .join('');
 
-    let lightbox = new SimpleLightbox('.gallery a', {
-        captionsData: 'alt',
-        captionPosition: 'button',
-        captoinDelay: 250,
-    });
+  galleryEl.insertAdjacentHTML('beforeend', currentData);
 
-    lightbox.on('show.simplelightbox', () => {
-        console.log('simple');
-    });
+  // simple lightbox
+  let lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: 'alt',
+    captionPosition: 'bottom',
+    captionDelay: 250,
+  });
 
+  lightbox.on('show.simplelightbox', () => {
+    console.log('simple');
+  });
 };
 
 const handleSubmitButton = async event => {
   event.preventDefault();
   loadMoreButton.classList.add('is-hidden');
-  pixabayAPI.query = event.target.firstElementChild.value;
+  pixiInstance.query = event.target.firstElementChild.value;
 
- 
+  // clear gallary before new request
   galleryEl.innerHTML = '';
 
-  
+  // check input value
   if (!event.target.firstElementChild.value) {
     Notiflix.Notify.failure('Input is empty');
     return;
   }
 
   try {
-    const carts = await pixabayAPI.fetchPhotos();
+    const carts = await pixiInstance.fetchPhotos();
     const cartsArray = carts.data.hits;
-    ppixabayAPI.total_hits = carts.data.totalHits;
+    pixiInstance.total_hits = carts.data.totalHits;
 
-   
+    //   show total hits
     if (carts && carts.data.totalHits > 0) {
       Notiflix.Notify.success(
         `Hooray! We found ${carts.data.totalHits} images.`
       );
     }
 
-   
+    // check data was'n be not empty array
     if (cartsArray.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -93,19 +95,19 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
-    const carts = await pixabayAPI.fetchPhotos();
+    const carts = await pixiInstance.fetchPhotos();
     const cartsArray = carts.data.hits;
     renderData(cartsArray);
 
-   
-    if (pixabayAPI.total_hits <= pixabayAPI.page * pixabayAPI.per_page) {
+    // check total hits
+    if (pixiInstance.total_hits <= pixiInstance.page * pixiInstance.per_page) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
       loadMoreButton.classList.add('is-hidden');
     }
 
- 
+    // scroll by 2 cart height
     const { height: cardHeight } = document
       .querySelector('.gallery')
       .firstElementChild.getBoundingClientRect();
@@ -119,6 +121,6 @@ const handleLoadMoreButton = async () => {
   }
 };
 
-
+// add event listener
 formEl.addEventListener('submit', handleSubmitButton);
 loadMoreButton.addEventListener('click', handleLoadMoreButton);
