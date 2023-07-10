@@ -7,7 +7,6 @@ const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
 
-
 const pixabayApi = new PixabayAPI();
 
 const renderData = arrData => {
@@ -62,23 +61,12 @@ const handleSubmitButton = async event => {
 
   galleryEl.innerHTML = '';
 
- 
-  if (!event.target.firstElementChild.value) {
-    Notiflix.Notify.failure('Input is empty');
-    return;
-  }
-
   try {
+    pixabayApi.resetPage(); 
+
     const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
     pixabayApi.total_hits = carts.data.totalHits;
-
- 
-    if (carts && carts.data.totalHits > 0) {
-      Notiflix.Notify.success(
-        `Hooray! We found ${carts.data.totalHits} images.`
-      );
-    }
 
     if (cartsArray.length === 0) {
       Notiflix.Notify.failure(
@@ -86,6 +74,8 @@ const handleSubmitButton = async event => {
       );
       return;
     }
+
+    Notiflix.Notify.success(`Hooray! We found ${carts.data.totalHits} images.`);
 
     renderData(cartsArray);
     loadMoreButton.classList.remove('is-hidden');
@@ -96,22 +86,19 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
-    if (pixabayApi.page === 1) {
-         pixabayApi.page = 0;
-    }
-
     pixabayApi.page += 1; 
-
     const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
-    renderData(cartsArray);
 
-    if (pixabayApi.total_hits <= (pixabayApi.page - 1) * pixabayApi.per_page + cartsArray.length) {
+    if (cartsArray.length === 0) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
       loadMoreButton.classList.add('is-hidden');
+      return;
     }
+
+    renderData(cartsArray);
 
     const { height: cardHeight } = document
       .querySelector('.gallery')
@@ -127,4 +114,4 @@ const handleLoadMoreButton = async () => {
 };
 
 formEl.addEventListener('submit', handleSubmitButton);
-loadMoreButton.addEventListener('click', handleLoadMoreButton);  
+loadMoreButton.addEventListener('click', handleLoadMoreButton);
