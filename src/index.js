@@ -96,6 +96,9 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
+    pixabayApi.page = 0;
+    pixabayApi.per_page = pixabayApi.initial_per_page;
+
     const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
     const currentTotalHits = carts.data.totalHits;
@@ -108,12 +111,6 @@ const handleLoadMoreButton = async () => {
       );
       loadMoreButton.classList.add('is-hidden');
       return;
-    }
-
-    if (cartsArray.length < pixabayApi.per_page) {
-      pixabayApi.per_page = cartsArray.length;
-    } else {
-      pixabayApi.per_page = pixabayApi.initial_per_page;
     }
 
     pixabayApi.total_hits = currentTotalHits; 
@@ -132,6 +129,5 @@ const handleLoadMoreButton = async () => {
     Notiflix.Notify.failure('Error 404');
   }
 };
-
 formEl.addEventListener('submit', handleSubmitButton);
 loadMoreButton.addEventListener('click', handleLoadMoreButton);
