@@ -55,6 +55,11 @@ const handleSubmitButton = async event => {
   loadMoreButton.classList.add('is-hidden');
   pixabayApi.query = event.target.firstElementChild.value;
 
+  if (!event.target.firstElementChild.value.trim()) {
+    Notiflix.Notify.failure('Input is empty');
+    return;
+  }
+
   galleryEl.innerHTML = '';
 
  
