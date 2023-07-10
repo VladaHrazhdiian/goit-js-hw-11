@@ -96,13 +96,17 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
-    pixabayApi.page = 0; 
+    if (pixabayApi.page === 1) {
+         pixabayApi.page = 0;
+    }
+
+    pixabayApi.page += 1; 
 
     const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
     renderData(cartsArray);
 
-    if (pixabayApi.total_hits <= pixabayApi.page * pixabayApi.per_page) {
+    if (pixabayApi.total_hits <= (pixabayApi.page - 1) * pixabayApi.per_page + cartsArray.length) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
