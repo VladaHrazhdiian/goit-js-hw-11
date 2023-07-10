@@ -2,16 +2,16 @@ import axios from 'axios';
 
 export default class PixabayAPI {
   #API_KEY = '38110026-5bfbf894cc748013b74eb0441';
-   #BASE_URL = 'https://pixabay.com/api/';
+  #BASE_URL = 'https://pixabay.com/api/';
 
-  page = 0;
+  page = 1;
   per_page = 40;
 
   total_hits = null;
   query = null;
 
-  async fetchPhotos() {
-    this.page += 1;
+  async fetchPhotos(page = this.page) {
+    this.page = page;
 
     try {
       return await axios.get(

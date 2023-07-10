@@ -7,8 +7,8 @@ const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
 
-
 const pixabayApi = new PixabayAPI();
+let currentPage = 1;
 
 const renderData = arrData => {
   const currentData = arrData
@@ -53,34 +53,28 @@ const renderData = arrData => {
 const handleSubmitButton = async event => {
   event.preventDefault();
   loadMoreButton.classList.add('is-hidden');
-  pixabayApi.query = event.target.firstElementChild.value;
+  const inputValue = event.target.firstElementChild.value.trim();
 
-  if (!event.target.firstElementChild.value.trim()) {
-  Notiflix.Notify.failure('Input is empty');
-  return;
-}
-
-  galleryEl.innerHTML = '';
-
- 
-  if (!event.target.firstElementChild.value) {
+  if (!inputValue) {
     Notiflix.Notify.failure('Input is empty');
     return;
   }
 
+  if (pixabayApi.query !== inputValue) {
+    pixabayApi.query = inputValue;
+    currentPage = 1;
+  }
+
+  galleryEl.innerHTML = '';
+
   try {
-    const carts = await pixabayApi.fetchPhotos();
+    const carts = await pixabayApi.fetchPhotos(currentPage);
     const cartsArray = carts.data.hits;
-    pixabayApi.total_hits = carts.data.totalHits;
+    const totalHits = carts.data.totalHits;
 
- 
-    if (carts && carts.data.totalHits > 0) {
-      Notiflix.Notify.success(
-        `Hooray! We found ${carts.data.totalHits} images.`
-      );
-    }
-
-    if (cartsArray.length === 0) {
+    if (totalHits > 0) {
+      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    } else {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
@@ -96,11 +90,13 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
-    const carts = await pixabayApi.fetchPhotos();
+    currentPage++;
+    const carts = await pixabayApi.fetchPhotos(currentPage);
     const cartsArray = carts.data.hits;
+
     renderData(cartsArray);
 
-    if (pixabayApi.total_hits <= pixabayApi.page * pixabayApi.per_page) {
+    if (cartsArray.length < pixabayApi.per_page) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
@@ -121,4 +117,4 @@ const handleLoadMoreButton = async () => {
 };
 
 formEl.addEventListener('submit', handleSubmitButton);
-loadMoreButton.addEventListener('click', handleLoadMoreButton);  
+loadMoreButton.addEventListener('click', handleLoadMoreButton);
