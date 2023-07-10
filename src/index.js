@@ -96,24 +96,20 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
-    pixabayApi.page = 0;
-    pixabayApi.per_page = pixabayApi.initial_per_page;
+    const currentTotalHits = pixabayApi.total_hits;
+
+    pixabayApi.page += 1;
 
     const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
-    const currentTotalHits = carts.data.totalHits;
 
-    if (
-      currentTotalHits <= (pixabayApi.page - 1) * pixabayApi.per_page + cartsArray.length
-    ) {
-      Notiflix.Notify.warning(
-        "We're sorry, but you've reached the end of search results."
+    if (cartsArray.length === 0) {
+      Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
       );
       loadMoreButton.classList.add('is-hidden');
       return;
     }
-
-    pixabayApi.total_hits = currentTotalHits; 
 
     renderData(cartsArray);
 
@@ -125,9 +121,20 @@ const handleLoadMoreButton = async () => {
       top: cardHeight * 2,
       behavior: 'smooth',
     });
+
+    if (currentTotalHits !== null && pixabayApi.page * pixabayApi.per_page >= currentTotalHits) {
+      Notiflix.Notify.warning("We're sorry, but you've reached the end of search results.");
+      loadMoreButton.classList.add('is-hidden');
+      return;
+    }
+
+    if (currentTotalHits === null && carts.data.totalHits > 0) {
+      pixabayApi.total_hits = carts.data.totalHits;
+    }
   } catch (err) {
     Notiflix.Notify.failure('Error 404');
   }
 };
+
 formEl.addEventListener('submit', handleSubmitButton);
 loadMoreButton.addEventListener('click', handleLoadMoreButton);
