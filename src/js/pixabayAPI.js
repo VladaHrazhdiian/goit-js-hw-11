@@ -11,18 +11,19 @@ export default class PixabayAPI {
   query = null;
 
   async fetchPhotos(page = this.page) {
-    this.page = page;
+  this.page = page;
 
-    try {
-      return await axios.get(
-        `${this.#BASE_URL}?key=${this.#API_KEY}&q=${
-          this.query
-        }&image_type=photo&orientation=horizontal&safesearch=true&per_page=${
-          this.per_page
-        }&page=${this.page}`
-      );
-    } catch (err) {
-      console.log(err);
-    }
+  try {
+    return await axios.get(
+      `${this.#BASE_URL}?key=${this.#API_KEY}&q=${
+        this.query
+      }&image_type=photo&orientation=horizontal&safesearch=true&per_page=${
+        this.per_page
+      }&page=${this.page}`
+    );
+  } catch (err) {
+    console.log(err);
+    throw new Error('Oops! Error occurred. Please try again later.');
   }
+}
 }
