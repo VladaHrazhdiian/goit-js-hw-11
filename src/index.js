@@ -98,8 +98,9 @@ const handleLoadMoreButton = async () => {
   try {
     const carts = await pixabayApi.fetchPhotos();
     const cartsArray = carts.data.hits;
+    const currentTotalHits = carts.data.totalHits;
 
-    if (cartsArray.length === 0) {
+    if (cartsArray.length === 0 || currentTotalHits <= pixabayApi.page * pixabayApi.per_page) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
@@ -107,6 +108,7 @@ const handleLoadMoreButton = async () => {
       return;
     }
 
+    pixabayApi.total_hits = currentTotalHits;
     renderData(cartsArray);
 
     const { height: cardHeight } = document
