@@ -110,6 +110,12 @@ const handleLoadMoreButton = async () => {
       return;
     }
 
+    if (cartsArray.length < pixabayApi.per_page) {
+      pixabayApi.per_page = cartsArray.length;
+    } else {
+      pixabayApi.per_page = pixabayApi.initial_per_page;
+    }
+
     pixabayApi.total_hits = currentTotalHits; 
 
     renderData(cartsArray);
@@ -122,10 +128,6 @@ const handleLoadMoreButton = async () => {
       top: cardHeight * 2,
       behavior: 'smooth',
     });
-
-     if (cartsArray.length < pixabayApi.per_page) {
-      pixabayApi.per_page = cartsArray.length;
-    }
   } catch (err) {
     Notiflix.Notify.failure('Error 404');
   }
