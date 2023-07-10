@@ -110,6 +110,8 @@ const handleLoadMoreButton = async () => {
       return;
     }
 
+    pixabayApi.total_hits = currentTotalHits;
+
     renderData(cartsArray);
 
     const { height: cardHeight } = document
