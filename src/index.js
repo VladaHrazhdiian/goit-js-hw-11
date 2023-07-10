@@ -110,7 +110,7 @@ const handleLoadMoreButton = async () => {
       return;
     }
 
-    pixabayApi.total_hits = currentTotalHits;
+    pixabayApi.total_hits = currentTotalHits; 
 
     renderData(cartsArray);
 
@@ -122,6 +122,10 @@ const handleLoadMoreButton = async () => {
       top: cardHeight * 2,
       behavior: 'smooth',
     });
+
+     if (cartsArray.length < pixabayApi.per_page) {
+      pixabayApi.per_page = cartsArray.length;
+    }
   } catch (err) {
     Notiflix.Notify.failure('Error 404');
   }
