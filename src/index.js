@@ -100,6 +100,8 @@ const handleLoadMoreButton = async () => {
     const cartsArray = carts.data.hits;
     renderData(cartsArray);
 
+       pixabayApi.total_hits = carts.data.totalHits;
+
     if (pixabayApi.total_hits <= pixabayApi.page * pixabayApi.per_page) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
