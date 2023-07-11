@@ -12,7 +12,6 @@ export default class PixabayAPI {
   async fetchPhotos(page = 1) {
     try {
       const config = {
-        url: this.#BASE_URL,
         params: {
           key: this.#API_KEY,
           q: this.query,
@@ -24,7 +23,7 @@ export default class PixabayAPI {
         },
       };
 
-      const response = await axios.get(config.url, { params: config.params });
+      const response = await axios.get(this.#BASE_URL, config);
       return response.data;
     } catch (err) {
       console.log(err);
