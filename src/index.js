@@ -56,7 +56,12 @@ const handleSubmitButton = async event => {
   event.preventDefault();
   loadMoreButton.classList.add('is-hidden');
   pixabayApi.query = event.target.firstElementChild.value.trim();
-  currentPage = 1; 
+
+  
+  if (pixabayApi.query !== pixabayApi.prevQuery) {
+    currentPage = 1; 
+  }
+
   galleryEl.innerHTML = '';
 
   if (!pixabayApi.query) {
@@ -84,6 +89,9 @@ const handleSubmitButton = async event => {
 
     renderData(cartsArray);
     loadMoreButton.classList.remove('is-hidden');
+
+    
+    pixabayApi.prevQuery = pixabayApi.query;
   } catch (err) {
     Notiflix.Notify.failure('Error 404');
   }
