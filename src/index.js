@@ -8,7 +8,9 @@ const galleryEl = document.querySelector('.gallery');
 const loadMoreButton = document.querySelector('.load-more');
 
 const pixabayApi = new PixabayAPI();
+pixabayApi.per_page = 40; 
 
+let currentPage = 1; 
 
 const renderData = arrData => {
   const currentData = arrData
@@ -39,7 +41,6 @@ const renderData = arrData => {
 
   galleryEl.insertAdjacentHTML('beforeend', currentData);
 
-  
   let lightbox = new SimpleLightbox('.gallery a', {
     captionsData: 'alt',
     captionPosition: 'bottom',
@@ -54,8 +55,8 @@ const renderData = arrData => {
 const handleSubmitButton = async event => {
   event.preventDefault();
   loadMoreButton.classList.add('is-hidden');
-  pixabayApi.query = event.target.firstElementChild.value.trim(); 
-
+  pixabayApi.query = event.target.firstElementChild.value.trim();
+  currentPage = 1; 
   galleryEl.innerHTML = '';
 
   if (!pixabayApi.query) {
@@ -64,18 +65,16 @@ const handleSubmitButton = async event => {
   }
 
   try {
-    const carts = await pixabayApi.fetchPhotos();
+    const carts = await pixabayApi.fetchPhotos(currentPage);
     const cartsArray = carts.data.hits;
     pixabayApi.total_hits = carts.data.totalHits;
 
-   
     if (carts && carts.data.totalHits > 0) {
       Notiflix.Notify.success(
         `Hooray! We found ${carts.data.totalHits} images.`
       );
     }
 
-   
     if (cartsArray.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
@@ -92,11 +91,13 @@ const handleSubmitButton = async event => {
 
 const handleLoadMoreButton = async () => {
   try {
-    const carts = await pixabayApi.fetchPhotos();
+    currentPage++; 
+
+    const carts = await pixabayApi.fetchPhotos(currentPage);
     const cartsArray = carts.data.hits;
     renderData(cartsArray);
 
-    if (pixabayApi.total_hits <= pixabayApi.page * pixabayApi.per_page) {
+    if (pixabayApi.total_hits <= currentPage * pixabayApi.per_page) {
       Notiflix.Notify.warning(
         "We're sorry, but you've reached the end of search results."
       );
