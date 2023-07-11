@@ -9,9 +9,16 @@ export default class PixibayAPI {
 
   total_hits = null;
   query = null;
+  prevQuery = null; 
 
-  async fetchPhotos() {
-    this.page += 1;
+  async fetchPhotos(page = null) {
+    if (page !== null) {
+      
+      this.page = page;
+    } else {
+  
+      this.page += 1;
+    }
 
     try {
       return await axios.get(

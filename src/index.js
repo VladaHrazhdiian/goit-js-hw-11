@@ -60,6 +60,7 @@ const handleSubmitButton = async event => {
   
   if (pixabayApi.query !== pixabayApi.prevQuery) {
     currentPage = 1; 
+    pixabayApi.per_page = 40; 
   }
 
   galleryEl.innerHTML = '';
@@ -100,7 +101,6 @@ const handleSubmitButton = async event => {
 const handleLoadMoreButton = async () => {
   try {
     currentPage++; 
-
     const carts = await pixabayApi.fetchPhotos(currentPage);
     const cartsArray = carts.data.hits;
     renderData(cartsArray);
@@ -120,6 +120,8 @@ const handleLoadMoreButton = async () => {
       top: cardHeight * 2,
       behavior: 'smooth',
     });
+
+      pixabayApi.per_page = 40;
   } catch (err) {
     Notiflix.Notify.failure('Error 404');
   }
